@@ -1,0 +1,5 @@
+Operand:A	Opcode:01	Type:rg
+Operand:B	Opcode:02	Type:rg
+Operand:C	Opcode:03	Type:rg
+Operand:D	Opcode:04	Type:rg
+Operand:-	Opcode:-	Type:-

@@ -1,0 +1,2 @@
+ MOVER A 100
+ MOVEM B 200

@@ -1,0 +1,9 @@
+Mnemonic:mover	Opcode:04	Type:is
+Mnemonic:movem	Opcode:05	Type:is
+Mnemonic:add	Opcode:01	Type:is
+Mnemonic:read	Opcode:09	Type:is
+Mnemonic:start	Opcode:01	Type:ad
+Mnemonic:end	Opcode:02	Type:ad
+Mnemonic:origin	Opcode:03	Type:ad
+Mnemonic:dc	Opcode:01	Type:dl
+Mnemonic:ds	Opcode:02	Type:dl
