@@ -17,6 +17,22 @@ void createMOT();
 void createROT();
 void conv();
 
+struct ltable
+{
+	int index;
+	char literal[20];
+	int address;
+
+};
+
+struct stable
+{
+	int index;
+	char symbol[20];
+	int address;
+	int length;
+};
+
 int main(void)
 {
 	int ch;
@@ -174,21 +190,20 @@ int checkformat(char operand[20])
 
 void conv()
 {
-	/*int new = 0;
-	printf("Do you want to create new instruction file?\n");
-	scanf("%d",&new);
-	if(new == 1)
-	{
-		createins();
-	}*/
+	int count = 0;
+	int lc=0;
+	int category;
+	int literalcount=0;
+	int symbolcount=0;
+
+
+	struct ltable lt[20];
+	struct stable st[20];
+
 
 	char m[20],op1[20],op2[20],l[20];
 	char m1[20],o[20],type[20];
 	char r[20],o1[20],type1[20];
-	/*printf("Enter the Instruction\n");
-	scanf("%s",m);
-	scanf("%s",op1);
-	scanf("%s",op2);*/
 
 	int i=0,flag=0;
 
@@ -196,6 +211,8 @@ void conv()
 	ins = fopen("ins.txt","r");
 	while(fscanf(ins,"%s\t%s\t%s\t%s\n",l,m,op1,op2) != EOF)
 	{
+		count++;
+
 		//printf("%s\t%s\t%s\t%s\n",l,m,op1,op2);
 
 
@@ -203,9 +220,21 @@ void conv()
 
 		FILE *f;
 		f = fopen("mot.txt","r");
-		printf("%s\t",l);
+		//printf("%s\t",l);
+		printf("%d\t",lc);
 		while( fscanf(f,"Mnemonic:%s\tOpcode:%s\tType:%s\n",m1,o,type) != EOF )
 		    {
+					if(count == 1)
+						{
+							if(strcmp(m,"start")!=0)
+							{
+								printf("START ERROR\n");
+							}
+							else
+							{
+								lc = atoi(op1);
+							}
+						}
 
 				if(strcmp(m,m1) == 0)
 				{
@@ -213,37 +242,111 @@ void conv()
 					flag=1;
 				}
 
+
 		    }
 		fclose(f);
 		flag=0;
+		if(strcmp(type,"ad") != 0)
+		{
+			lc++;
+		}
+
+		if(strcmp(m,"ltorg")==0)
+		{
+				i=0;
+				while(lt[i].address!=0)
+				{
+					i++;
+				}
+				while(i<=literalcount)
+				{
+					lt[i].address = lc;
+					lc++;
+					i++;
+				}
+				printf("\n");
+
+		}
+
 
 		FILE *ff;
 		ff = fopen("rot.txt","r");
+		if(strcmp(op1,"-")!=0)
+		{
 
 		while( fscanf(ff,"Operand:%s\tOpcode:%s\tType:%s\n",r,o1,type1) != EOF )
 			{
 
 				if(strcmp(r,op1) == 0)
 				{
-					printf("%s\t",o1);
+					printf("(%s)\t",o1);
 					flag=1;
 				}
 
 
 			}
+
 		fclose(ff);
+		if(flag ==0 )
+		{
+			category = checkformat(op1);
+			if(category ==1)
+			{
+				printf("(C,%s)\n",op1);
+			}
+		}
+		}
 
 		flag=0;
 
-int category;
 
-		if(flag==0)
+
+		if(flag==0 && strcmp(op2,"-")!=0)
 		{
 			category=checkformat(op2);
+
+			if(category == 1)
+			{
+				printf("(C,%s)\n",op2);
+			}
+			if( category == 3)
+			{
+				int lflag=0;
+				printf("(L,%d)\n",literalcount);
+
+				for(i=0;i<=literalcount;i++)
+				{
+					if(strcmp(lt[i].literal,op2)==0)
+					{
+						lflag=1;
+					}
+				}
+				if(lflag==0)
+				{
+
+					lt[literalcount].index = literalcount;
+					strcpy(lt[literalcount].literal,op2);
+					lt[literalcount].address = 0;
+					literalcount++;
+				}
+			}
+			if( category == 2)
+			{
+				printf("(S,%d)\n",symbolcount);
+				symbolcount++;
+			}
 		}
-		printf("%d\n",category);
 
 
+
+	}
+
+	printf("\n\n");
+	printf("\tLiteral Table\n");
+	printf("\tIndex\tLiteral\tAddress\n");
+	for(i=0;i<literalcount;i++)
+	{
+		printf("\t%d\t%s\t%d\n",lt[i].index,lt[i].literal,lt[i].address);
 	}
 
 
@@ -251,9 +354,4 @@ int category;
 
 
 
-
 }
-
-
-
-
