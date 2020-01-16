@@ -1,6 +1,10 @@
 package Weatherpackage;
+import org.apache.hadoop.mapreduce.Job;  
+import org.apache.hadoop.mapreduce.Mapper;  
+import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.hadoop.conf.Configuration;
 
@@ -11,12 +15,6 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
 import org.apache.hadoop.io.Text;
-
-import org.apache.hadoop.mapreduce.Job;
-
-import org.apache.hadoop.mapreduce.Mapper;
-
-import org.apache.hadoop.mapreduce.Reducer;
 
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
@@ -38,17 +36,20 @@ public class Weatherclass {
 
 	Path input=new Path(files[0]);
 
-	Path output=new Path(files[1]);
+	//Path output=new Path(files[1]);
+	Path output=new Path("FirstMapper");
 
 	Job j=new Job(c,"wordcount");
 	
-	Job jj=new Job(c,"w1");
 
 	j.setJarByClass(Weatherclass.class);
 
 	j.setMapperClass(MapForWordCount.class);
 
 	j.setReducerClass(ReduceForWordCount.class);
+	
+	j.setMapOutputKeyClass(Text.class);
+	j.setMapOutputValueClass(IntWritable.class);
 	
 
 	j.setOutputKeyClass(Text.class);
@@ -58,8 +59,36 @@ public class Weatherclass {
 	FileInputFormat.addInputPath(j, input);
 
 	FileOutputFormat.setOutputPath(j, output);
+	//output.getFileSystem(c).delete(output);
 
-	System.exit(j.waitForCompletion(true)?0:1);
+	j.waitForCompletion(true);
+	
+	 Configuration conf2=new Configuration();
+	 
+	 Path output1=new Path(files[1]);
+	 
+	 Job j2=new Job(conf2,"wordcount1");
+	 
+     j2.setJarByClass(Weatherclass.class);
+     
+     j2.setMapperClass(MapForWordCount1.class);
+     
+     j2.setReducerClass(ReduceForWordCount1.class);
+     
+     j2.setMapOutputKeyClass(Text.class);
+     j2.setMapOutputValueClass(IntWritable.class);
+     
+     j2.setOutputKeyClass(Text.class);
+     
+     j2.setOutputValueClass(IntWritable.class);
+     
+     FileInputFormat.addInputPath(j2, output);
+     
+     FileOutputFormat.setOutputPath(j2, output1);
+     
+     System.exit(j2.waitForCompletion(true)?0:1);
+     
+	
 
 	}
 
@@ -118,53 +147,103 @@ public class Weatherclass {
 
 	   }
 	   sum = sum/i;
+	   
 
-	   con.write(word, new IntWritable(sum));
-	   year[index] = word;
-	   t[index] = sum;
-	   index++;
+	   con.write(new Text(word), new IntWritable(sum));
 	   
 	   
 	  
 	   
 
 	}
+	
+	
+
+}
+	
+	public static class MapForWordCount1 extends Mapper<Text, Text, Text, IntWritable>{
+		
+		/*String[] y = new String[40];
+		int[] t = new int[40];
+		int i=0;*/
+
+		public void map1(Text key, Text value, Context con) throws IOException, InterruptedException
+
+		{
+			String line = value.toString();
+			
+			String[] split = line.split("\\s+");
+			
+			int temperature = Integer.valueOf(split[1]);
+			
+			Text key1 = new Text(split[0]);
+			IntWritable pair = new IntWritable(temperature);
+
+			
+			con.write(key1, pair);
+			
+			
+			
+			
+			
+
+			
+		
+
+		}
+
+		}
+	
+	public static class ReduceForWordCount1 extends Reducer<Text, IntWritable, Text, IntWritable>
+
+	{
+		
+		
+
+
 	public void reduce1(Text word, Iterable<IntWritable> values, Context con) throws IOException, InterruptedException
 
 	{
-		 int max = getMax(t);
-		 int min = getMin(t);
-		 
-		 con.write(year[max],new IntWritable(t[max]));
-		 con.write(year[min], new IntWritable(t[min]));
+		Iterator<IntWritable> iterator = values.iterator();
+		
+		int min = Integer.MAX_VALUE, max = 0;
+		
+		while (iterator.hasNext()) {
+
+			int value = iterator.next().get();
+
+			if (value < min) { 
+
+			min = value;
+
+			}
+
+			if (value > max) { 
+
+			max = value;
+
+			}
+			}
+		
+		con.write(word, new IntWritable(min));
 		
 		
 		
 		
 		
-	}
-	 public static int getMax(int[] inputArray){ 
-		    int maxValue = inputArray[0]; 
-		    for(int i=1;i < inputArray.length;i++){ 
-		      if(inputArray[i] > maxValue){ 
-		         maxValue = i; 
-		      } 
-		    } 
-		    return maxValue; 
-		  }
-		 
-		  // Method for getting the minimum value
-		  public static int getMin(int[] inputArray){ 
-		    int minValue = inputArray[0]; 
-		    for(int i=1;i<inputArray.length;i++){ 
-		      if(inputArray[i] < minValue){ 
-		        minValue = i; 
-		      } 
-		    } 
-		    return minValue; 
-		  } 
 	
 
+	
+	  
+	   
+	  
+	   
+
 	}
+	}
+	
+	
+
 
 }
+
