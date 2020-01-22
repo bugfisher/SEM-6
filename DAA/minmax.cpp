@@ -63,6 +63,38 @@ void minmax(int *a,int low,int high,int* min,int* max)
 	}
 
 	int mid = (low + high)/2;
+	cout<<"Elements- ";
+	for(int i=low;i<=mid;i++)
+				{
+					cout<<a[i]<<" ";
+
+
+				}
+
+
+
+
+
+			cout<<"    ";
+			cout<<"min- "<<*min<<"   ";
+			cout<<"max- "<<*max<<endl<<endl;
+
+			cout<<"Elements- ";
+
+			for(int i=mid+1;i<=high;i++)
+							{
+								cout<<a[i]<<" ";
+
+
+							}
+
+
+
+
+						cout<<"    ";
+						cout<<"min- "<<*min<<"   ";
+						cout<<"max- "<<*max<<endl<<endl;
+
 
 	minmax(a,low,mid,min,max);
 
@@ -80,7 +112,7 @@ void minmax(int *a,int low,int high,int* min,int* max)
 
 		cout<<"    ";
 		cout<<"min- "<<*min<<"   ";
-		cout<<"max- "<<*max<<endl;
+		cout<<"max- "<<*max<<endl<<endl;
 
 
 
@@ -100,7 +132,7 @@ void minmax(int *a,int low,int high,int* min,int* max)
 
 			cout<<"    ";
 			cout<<"min- "<<*min<<"   ";
-			cout<<"max- "<<*max<<endl;
+			cout<<"max- "<<*max<<endl<<endl;
 
 }
 
