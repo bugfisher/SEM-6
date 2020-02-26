@@ -1,176 +1,177 @@
-//============================================================================
-// Name        : minmax.cpp
-// Author      :
-// Version     :
-// Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
-//============================================================================
-
 #include <iostream>
-#include<climits>
+#include <bits/stdc++.h>
+
 using namespace std;
 
-void minmax(int *a,int low,int high,int* min,int* max)
+class job
+{
+public:
+	string name;
+	int size;
+};
+
+class tape
+{
+	public:
+	int size;
+	int job[10];
+	int count=0;
+};
+
+bool compare(job j1,job j2)
+{
+	return j1.size <= j2.size;
+}
+
+int optimal(job j[],tape t[],int n,int m,int size)
 {
 
-	if(low == high)
+	int MRT=0;
+	int tmrt[m];
+	int total=0;
+
+
+	int i=0;
+	int loop=0;
+	int k=0;
+	for( i=0;i<n;i++)
 	{
-		if(*min > a[low])
+
+
+
+
+
+		int sum=0;
+		if(t[k].size >= j[i].size)
 		{
-			*min = a[low];
-		}
-		if(*max < a[low])
-		{
-			*max = a[low];
-		}
-
-
-		return;
-	}
-
-	if((high - low) == 1 )
-	{
-		if(a[low] < a[high])
-		{
-			if(*min > a[low])
-			{
-				*min = a[low];
-			}
-
-			if(*max < a[high])
-			{
-				*max = a[high];
-			}
-
-
+			t[k].size = t[k].size - j[i].size;
+			t[k].job[loop]=i;
+			t[k].count++;
 		}
 		else
 		{
-			if(*min > a[high])
+			cout<<endl<<"Space not available for job-";
+			for(int v=i;v<n;v++)
 			{
-				*min = a[high];
+				cout<<j[v].name<<" ";
 			}
-
-			if(*max < a[low])
-			{
-				*max = a[low];
-			}
-
-
+			return -1;
 		}
 
-		return;
+		cout<<endl<<"Job-"<<j[i].name<<" Allocated at tape"<<k;
+		/*for(int jj=0;jj<=i;jj++)
+		{
+			sum+=j[jj].size;
+		}
+		cout<<sum<<endl<<endl;
+		MRT+=sum;*/
+
+
+		if(i == m-1)
+		{
+			loop++;
+		}
+
+
+		k = (k+1)%m;
+
+
 	}
 
-	int mid = (low + high)/2;
-	cout<<"Elements- ";
-	for(int i=low;i<=mid;i++)
-				{
-					cout<<a[i]<<" ";
+	for(int i=0;i<m;i++)
+	{
+		cout<<endl<<"Tape-"<<i<<"--";
+		for(int jj=0;jj<=loop;jj++)
+		{
+			cout<<j[t[i].job[jj]].name<<" ";
+		}
+		cout<<"count"<<t[i].count<<" ";
+		cout<<endl;
+	}
 
 
-				}
-
-
-
-
-
-			cout<<"    ";
-			cout<<"min- "<<*min<<"   ";
-			cout<<"max- "<<*max<<endl<<endl;
-
-			cout<<"Elements- ";
-
-			for(int i=mid+1;i<=high;i++)
-							{
-								cout<<a[i]<<" ";
-
-
-							}
-
-
-
-
-						cout<<"    ";
-						cout<<"min- "<<*min<<"   ";
-						cout<<"max- "<<*max<<endl<<endl;
-
-
-	minmax(a,low,mid,min,max);
-
-	cout<<"Elements- ";
-		for(int i=low;i<=mid;i++)
+	for(int i=0;i<m;i++)
+	{
+		int jj=0;
+		MRT=0;
+		while(jj<t[i].count)
+		{
+			//int tmrt=0;
+			for(int ii=0;ii<=jj;ii++)
 			{
-				cout<<a[i]<<" ";
-
+				MRT+=j[t[i].job[ii]].size;
+				//MRT+=tmrt;
 
 			}
+			//j[t[i].job[jj]].mrt=tmrt;
 
 
+			jj++;
+		}
+
+		cout<<"MRT FOR TAPE-"<<i<<" "<<MRT<<endl;
+		tmrt[i] = MRT;
+		total+=MRT;
 
 
+	}
+	cout<<endl<<"total"<<total<<endl;
+	float avg = (float(total)/float(m));
 
-		cout<<"    ";
-		cout<<"min- "<<*min<<"   ";
-		cout<<"max- "<<*max<<endl<<endl;
-
-
-
-	minmax(a,mid+1,high,min,max);
-
-	cout<<"Elements- ";
-
-	for(int i=mid+1;i<=high;i++)
-				{
-					cout<<a[i]<<" ";
+	cout<<endl<<"Average MRT IS "<<avg<<endl;;
 
 
-				}
-
-
-
-
-			cout<<"    ";
-			cout<<"min- "<<*min<<"   ";
-			cout<<"max- "<<*max<<endl<<endl;
+	return 1;
 
 }
+
 
 int main()
 {
 	int n;
-	int *a=NULL;
-	int min = INT_MAX;
-	int max = INT_MIN;
+	int m;
+	int size;
 
+	cout<<"Enter number of Tapes"<<endl;
+	cin>>m;
 
-	cout<<"Enter Number of Elements"<<endl;
+	cout<<"Enter number of Jobs"<<endl;
 	cin>>n;
 
-	a = new int[n];
+	cout<<"Enter size of Tape"<<endl;
+	cin>>size;
 
-	cout<<"Enter the Elements"<<endl;
+	job j[10];
+	tape t[10];
+
+	for(int z=0;z<m;z++)
+	{
+		t[z].size = size;
+	}
+
+
+	cout<<"Enter Size of Jobs"<<endl;
 
 	for(int i=0;i<n;i++)
 	{
-		cin>>a[i];
+		cout<<endl<<"Enter name"<<endl;
+		cin>>j[i].name;
+		cout<<endl<<"Enter Size"<<endl;
+		cin>>j[i].size;
+
 	}
 
-	cout<<"Elements are: ";
-	for(int i=0;i<n;i++)
+	sort(j,j+n,compare);
+
+	/*for(int i=0;i<n;i++)
 	{
-		cout<<a[i]<<" ";
-	}
-	cout<<endl;
+		cout<<j[i].size;
+	}*/
 
-
-	minmax(a,0,n-1,&min,&max);
-
-	cout<<"max-"<<max<<endl;
-	cout<<"min-"<<min<<endl;
-
+	optimal(j,t,n,m,size);
 
 	return 0;
+
 }
 
 
